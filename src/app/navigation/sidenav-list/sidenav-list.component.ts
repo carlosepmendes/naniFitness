@@ -9,22 +9,29 @@ import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/cor
 })
 export class SidenavListComponent implements OnInit, OnDestroy {
 
-  sub: Subscription;
-  authStatus: boolean;
+  isAuth = false;
+  authSubscription: Subscription;
   @Output() closeSidenav = new EventEmitter<void>();
 
   constructor(private authService: AuthService) { }
 
   ngOnInit() {
-    this.sub = this.authService.authChange.subscribe( function(authStatus) { this.authStatus = authStatus; } );
+    this.authSubscription = this.authService.authChange.subscribe(authStatus => {
+      this.isAuth = authStatus;
+    });
   }
 
   onClose() {
     this.closeSidenav.emit();
   }
 
+  onLogout() {
+    this.onClose();
+    this.authService.logout();
+  }
+
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.authSubscription.unsubscribe();
   }
 
 }
